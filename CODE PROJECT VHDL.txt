@@ -1,0 +1,59 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.std_logic_arith.all;
+use IEEE.std_logic_unsigned.all;
+entity RSA is
+port(
+start : in STD_LOGIC;
+s : out STD_LOGIC_vector(63 downto 0)
+ );
+end RSA;
+architecture RSA_arch of RSA is 
+signal res_aff : std_logic_vector(63 downto 0);
+signal e : std_logic_vector(63 downto 0); 
+signal calc : std_logic;
+begin
+  p1:process (start)
+  constant e1: integer := 7; 
+  begin
+    if start = '0' then
+       e <= conv_std_logic_vector (e1,64);
+       calc <='1'; 
+	 else
+       calc <= '0';
+    end if;		 
+   end process p1 ;
+   process(calc)
+	  variable p,resul,y,m,z,res : integer;
+	  constant m1: integer := 203;
+     constant n: integer := 221 ;
+     constant r: integer := 256;
+     constant j: integer := 120 ;
+     constant v: integer := 139 ;
+	  begin
+	    if calc = '1' then
+		    m := m1*r mod n;
+			 p:= r-n ;
+          z:= m ;
+			 for i in e'reverse_range loop
+			    if e(i) = '1' then
+				     p:= p*z;
+					  y:= p*v mod r;
+					  resul:= (p+y*n)/r;
+					  p:= resul mod n;
+				  else
+				      p:= p;
+				  end if;
+				  z:= z*z;
+				  y:= z*v mod r;
+				  resul := (z+y*n)/r;
+				  z := resul mod n;
+			 end loop;
+	     res := p*j mod n;
+	     res_aff <= conv_std_logic_vector (res,64);
+	     end if;
+   end process; 		  
+s <= res_aff;
+end RSA_arch;
+
+
